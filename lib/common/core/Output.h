@@ -5,8 +5,8 @@
 #pragma once
 namespace Js
 {
-    enum Flag;
-    enum Phase;
+enum Flag: int;
+enum Phase: int;
 };
 
 #if defined(ENABLE_DEBUG_CONFIG_OPTIONS) && defined(BGJIT_STATS)
@@ -88,7 +88,11 @@ public:
     }
     static void     SetInMemoryLogger(Js::ILogger* logger);
     static void     SetStackTraceHelper(Js::IStackTraceHelper* helper);
+<<<<<<< HEAD
 #endif // ENABLE_TRACE
+=======
+#endif
+>>>>>>> Checkpoint commit: lib/common/core
     static size_t __cdecl Print(const wchar_t *form, ...);
     static size_t __cdecl Print(int column, const wchar_t *form, ...);
     static size_t __cdecl PrintBuffer(const wchar_t * buffer, size_t size);
