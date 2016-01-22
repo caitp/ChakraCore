@@ -5264,6 +5264,18 @@ BitScanForward(
     return bRet;
 }
 
+#if !defined(_MSC_VER) && !defined(_BitScanForward)
+inline
+unsigned char
+PALAPI
+_BitScanForward(
+    IN OUT PDWORD Index,
+    IN UINT qwMask)
+{
+    return BitScanForward(Index, qwMask);
+}
+#endif
+
 EXTERN_C
 PALIMPORT
 inline
@@ -5284,6 +5296,48 @@ BitScanForward64(
 
     return bRet;
 }
+
+#if !defined(_MSC_VER) && !defined(_BitScanForward64)
+inline
+unsigned char
+PALAPI
+_BitScanForward64(
+    IN OUT PDWORD Index,
+    IN UINT64 qwMask)
+{
+    return BitScanForward64(Index, qwMask);
+}
+#endif
+
+EXTERN_C
+PALIMPORT
+inline
+unsigned char
+PALAPI
+BitScanReverse(
+    IN OUT PDWORD Index,
+    IN UINT dwMask)
+{
+    unsigned char bRet = FALSE;
+    if (Index != 0) {
+      *Index = (DWORD)(__builtin_clz(dwMask) ^ 31U);
+      bRet = TRUE;
+    }
+
+    return bRet;
+}
+
+#if !defined(_MSC_VER) && !defined(_BitScanForward64)
+inline
+unsigned char
+PALAPI
+_BitScanReverse(
+    IN OUT PDWORD Index,
+    IN UINT dwMask)
+{
+    return BitScanReverse(Index, dwMask);
+}
+#endif
 
 /*++
 Function:

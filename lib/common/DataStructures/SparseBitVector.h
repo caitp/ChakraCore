@@ -4,7 +4,8 @@
 //-------------------------------------------------------------------------------------------------------
 #pragma once
 
-#if defined(_M_ARM64) || defined(_M_X64)
+// TODO(caitp): use architecture predefined macros rather than BIT64 PAL hack?
+#if defined(_M_ARM64) || defined(_M_X64) || defined(BIT64)
 typedef  BVUnit32 SparseBVUnit;
 #else
 typedef  BVUnit64 SparseBVUnit;
@@ -64,7 +65,8 @@ typedef  BVUnit64 SparseBVUnit;
 struct BVSparseNode
 {
     BVIndex         startIndex;
-#if defined(_M_ARM64) || defined(_M_X64)
+// TODO(caitp): use architecture predefined macros rather than BIT64 PAL hack?
+#if defined(_M_ARM64) || defined(_M_X64) || defined(BIT64)
     //64-bit: the order is changed to make sure it fits in 16 bytes
     SparseBVUnit    data;
     BVSparseNode *  next;

@@ -11,6 +11,7 @@ typedef wchar_t wchar16;
 typedef char16_t wchar16;
 
 // TODO: Abstract out into it's own file
+#include "inc/pal_char16.h"
 #include "inc/pal_mstypes.h"
 #include "inc/rt/palrt.h"
 #include "inc/rt/no_sal2.h"

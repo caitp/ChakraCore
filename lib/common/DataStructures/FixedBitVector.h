@@ -411,19 +411,40 @@ public:
     BOOLEAN TestAndSet(BVIndex i)
     {
         AssertRange(i);
+#if defined(_MSC_VER)
         return _bittestandset((long *)this->data, (long) i);
+#else
+        // ASSERT(BVUnit::Position(i) == 0)
+        long bit = 1 << (long)BVUnit::Offset(i);
+        BOOLEAN bRet = !!(*(long *)this->data[0] & bit);
+        *(long *)this->data[0] |= bit;
+        return bRet;
+#endif
     }
 
     BOOLEAN TestIntrinsic(BVIndex i) const
     {
         AssertRange(i);
+#if defined(_MSC_VER)
         return _bittest((long *)this->data, (long) i);
+#else
+        // ASSERT(BVUnit::Position(i) == 0)
+        return !!*(long *)this->data[0] & (1 << (long)BVUnit::Offset(i));
+#endif
     }
 
     BOOLEAN TestAndSetInterlocked(BVIndex i)
     {
         AssertRange(i);
+#if defined(_MSC_VER)
         return _interlockedbittestandset((long *)this->data, (long) i);
+#else
+        // According to MSDN, the above intrinsic is not guaranteed to be atomic
+        // on arm, and it is suggested that alternative variations are used
+        // instead. For now, atomic version is unimplemented.
+        // TODO(caitp): look into GCC/LLVM intrinsics for atomic test/set.
+        return TestAndSet(i);
+#endif
     }
 
     BOOLEAN TestAndClear(BVIndex i)

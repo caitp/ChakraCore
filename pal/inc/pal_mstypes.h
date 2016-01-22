@@ -605,7 +605,6 @@ typedef unsigned int uintptr_t;
 typedef char16_t WCHAR;
 
 #else // PAL_STDCPP_COMPAT
-
 typedef wchar_t WCHAR;
 #if defined(__LINUX__) 
 #ifdef BIT64

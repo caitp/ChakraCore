@@ -15,6 +15,18 @@
 #include <intrin.h>
 #endif
 
+
+#if !defined(_MSC_VER) && !defined(_countof)
+// TODO(caitp): are there compiler builtins for this in other toolchains?
+#if !defined(__cplusplus) || (__cplusplus < 201103L)
+#error "C++11 required."
+#else
+template <typename T, size_t N>
+static inline char (&Chakra_ArraySizeHelper(T (&array)[N]))[N];
+#define _countof(array) (sizeof(Chakra_ArraySizeHelper(array)))
+#endif // (__cplusplus >= 201103L)
+#endif
+
 // === Core Header Files ===
 #include "core/CommonMinMax.h"
 
@@ -42,19 +54,7 @@ using namespace Memory;
 // xplat-todo: Re-enable this
 // BitVector needs to be fixed up here
 
-#ifdef _WIN32
-// === Data structures Header Files ===
-#include "DataStructures/comparer.h"
-#include "DataStructures/SizePolicy.h"
 #include "DataStructures/BitVector.h"
-#include "DataStructures/SList.h"
-#include "DataStructures/DList.h"
-#include "DataStructures/KeyValuePair.h"
-#include "DataStructures/BaseDictionary.h"
-#include "DataStructures/DictionaryEntry.h"
-
-// === Configurations Header ===
-#include "core/ConfigFlagsTable.h"
 
 // === Page/Arena Memory Header Files ===
 #include "Memory/VirtualAllocWrapper.h"
@@ -63,4 +63,14 @@ using namespace Memory;
 #include "Memory/PageAllocator.h"
 #include "Memory/ArenaAllocator.h"
 
-#endif
+// === Data structures Header Files ===
+#include "DataStructures/comparer.h"
+#include "DataStructures/SizePolicy.h"
+#include "DataStructures/SList.h"
+#include "DataStructures/DList.h"
+#include "DataStructures/KeyValuePair.h"
+#include "DataStructures/BaseDictionary.h"
+#include "DataStructures/DictionaryEntry.h"
+
+// === Configurations Header ===
+#include "core/ConfigFlagsTable.h"

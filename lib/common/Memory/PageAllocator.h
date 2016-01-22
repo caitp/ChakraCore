@@ -198,7 +198,7 @@ public:
 
     uint GetAvailablePageCount() const
     {
-        size_t availablePageCount = SegmentBase::GetAvailablePageCount();
+        size_t availablePageCount = SegmentBase<TVirtualAlloc>::GetAvailablePageCount();
         Assert(availablePageCount < MAXUINT32);
         return static_cast<uint>(availablePageCount);
     }
@@ -399,6 +399,8 @@ public:
     {
         BackgroundPageQueue();
 
+        // TODO(caitp): Implement SLIST data structures on posix platforms, or
+        // have PageAllocator operate using a strategy based on WebKit/WTF's?
         SLIST_HEADER freePageList;
 
         CriticalSection backgroundPageQueueCriticalSection;

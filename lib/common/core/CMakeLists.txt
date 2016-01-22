@@ -23,4 +23,6 @@ add_library (Chakra.Common.core
   ${SOURCES}
 )
 
+set_property(TARGET Chakra.Common.core PROPERTY CXX_STANDARD 11)
+
 target_include_directories (Chakra.Common.core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

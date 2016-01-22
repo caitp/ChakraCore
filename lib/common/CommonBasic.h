@@ -40,8 +40,15 @@ typedef char16_t wchar16;
 // Apparently, some C++ headers will conflict with this-
 // not sure which ones but stubbing them out for now in linux-
 // we can revisit if we do hit a conflict
-#define __in
-#define __out
+//
+// TODO(caitp): Figure out a better way around this
+#if !defined(__in)
+#    define __in
+#endif
+
+#if !defined(__out)
+#    define __out
+#endif
 
 #endif
 
