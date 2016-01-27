@@ -3528,6 +3528,13 @@ PALIMPORT BOOL PALAPI TryEnterCriticalSection(IN OUT LPCRITICAL_SECTION lpCritic
 #define SEM_FAILCRITICALERRORS          0x0001
 #define SEM_NOOPENFILEERRORBOX          0x8000
 
+typedef unsigned (PALAPI *PAL_start_address)(void *);
+PALIMPORT
+uintptr_t PALAPI _beginthreadex(
+    IN void *security, unsigned stack_size,
+    IN PAL_start_address start_address, void *arglist,
+    unsigned initflag, unsigned *thrdaddr);
+
 #if !defined(_WIN32)
 
 typedef struct _SLIST_ENTRY {
@@ -3544,7 +3551,6 @@ typedef union DECLSPEC_ALIGN(16) _SLIST_HEADER {
 } SLIST_HEADER, *PSLIST_HEADER;
 
 PALIMPORT VOID PALAPI InitializeSListHead(IN OUT PSLIST_HEADER ListHead);
-
 
 #endif
 

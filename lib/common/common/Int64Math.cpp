@@ -3,8 +3,13 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 #include "CommonCommonPch.h"
-#include "Common\Int64Math.h"
+#include "Common/Int64Math.h"
+#ifdef _MSC_VER
 #include <intrin.h>
+#else
+#include <limits.h>
+static const INT64 MININT64 = LLONG_MIN;
+#endif
 
 #if _M_X64
 #pragma intrinsic(_mul128)

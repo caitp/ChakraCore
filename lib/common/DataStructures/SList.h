@@ -549,7 +549,6 @@ class SListBaseCounted : public SListBase<TData, RealCount>
 {
 };
 
-class ArenaAllocator;
 template <typename TData, typename TAllocator = ArenaAllocator, typename TCount = DefaultCount>
 class SList : public SListBase<TData, TCount>
 {

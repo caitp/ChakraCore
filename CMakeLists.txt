@@ -16,6 +16,7 @@ if(HAS_PREDEFINED_WCHAR_T)
 endif()
 
 add_definitions ("-fms-extensions")
+add_definitions("-fdiagnostics-color=always")
 
 # Disable some warnings
 #add_definitions("-Wno-tautological-constant-out-of-range-compare")

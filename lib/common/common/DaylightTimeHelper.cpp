@@ -6,8 +6,8 @@
 
 #include <time.h>
 
-#include "Common\DaylightTimeHelper.h"
-#include "Common\DateUtilities.h"
+#include "Common/DaylightTimeHelper.h"
+#include "Common/DateUtilities.h"
 
 namespace Js {
 
@@ -58,6 +58,7 @@ namespace Js {
         DateUtilities::GetYearFromTv(inputTime, year, yearType);
         int yearForInfo = year;
 
+#if defined(_WIN32)
         // GetTimeZoneInformationForYear() works only with years > 1600, but JS works with wider range of years. So we take year closest to given.
         if (year < 1601)
         {
@@ -67,10 +68,10 @@ namespace Js {
         {
             yearForInfo = 2100;
         }
+
         TIME_ZONE_INFORMATION timeZoneInfo;
         GetTimeZoneInformationForYear((USHORT)yearForInfo, NULL, &timeZoneInfo);
         isDaylightTimeApplicable = timeZoneInfo.StandardDate.wMonth != 0 && timeZoneInfo.DaylightDate.wMonth != 0;
-
         bias = timeZoneInfo.Bias;
         daylightBias = timeZoneInfo.DaylightBias;
         standardBias = timeZoneInfo.StandardBias;
@@ -89,6 +90,9 @@ namespace Js {
         january1 = DateUtilities::TvFromDate(year, 0, 0, 0);
         nextJanuary1 = january1 + TicksPerNonLeapYear + DateUtilities::FLeap(year) * TicksPerDay;
         lastUpdateTickCount = GetTickCount();
+#else // !defined(_WIN32)
+        // TODO(caitp): implement a posix alternative, with similar correctness characteristics.
+#endif
     }
 
     DaylightTimeHelper::TimeZoneInfo* DaylightTimeHelper::GetTimeZoneInfo(double time)
@@ -112,6 +116,7 @@ namespace Js {
 
     HINSTANCE DaylightTimeHelper::TryLoadLibrary()
     {
+#if defined(_WIN32)
         if (g_timezonedll == NULL)
         {
             HMODULE hLocal = LoadLibraryExW(L"api-ms-win-core-timezone-l1-1-0.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
@@ -136,10 +141,15 @@ namespace Js {
             }
         }
         return g_timezonedll;
+#else // !defined(_WIN32)
+        // TODO(caitp): just bundle a small-ish timezone database with the library, and update it periodically?
+        return nullptr;
+#endif
     }
 
     BOOL DaylightTimeHelper::SysLocalToUtc(SYSTEMTIME *local, SYSTEMTIME *utc)
     {
+    #if defined(_WIN32)
         if (sysLocalToUtc == NULL)
         {
             HINSTANCE library = TryLoadLibrary();
@@ -153,10 +163,14 @@ namespace Js {
             }
         }
         return sysLocalToUtc(NULL, local, utc);
+    #else // !defined(_WIN32)
+        return FALSE;
+    #endif
     }
 
     BOOL DaylightTimeHelper::SysUtcToLocal(SYSTEMTIME *utc, SYSTEMTIME *local)
     {
+#if defined(_WIN32)
         if (sysUtcToLocal == NULL)
         {
             HINSTANCE library = TryLoadLibrary();
@@ -170,6 +184,9 @@ namespace Js {
             }
         }
         return sysUtcToLocal(NULL, utc, local);
+    #else // !defined(_WIN32)
+        return FALSE;
+    #endif
     }
 
     int DaylightTimeHelper::DayNumber(int yearType, const SYSTEMTIME &date)

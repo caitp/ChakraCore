@@ -4,7 +4,7 @@
 //-------------------------------------------------------------------------------------------------------
 #include "CommonCommonPch.h"
 #include <float.h>
-#include "Common\SmartFPUControl.h"
+#include "Common/SmartFPUControl.h"
 
 //
 // Floating point unit utility functions
@@ -12,6 +12,7 @@
 
 static errno_t SetFPUControlDefault(void)
 {
+#if defined(_WIN32)
 #if _M_AMD64 || _M_ARM
     return _controlfp_s(0, _RC_NEAR + _DN_SAVE + _EM_INVALID + _EM_ZERODIVIDE +
         _EM_OVERFLOW + _EM_UNDERFLOW + _EM_INEXACT,
@@ -22,21 +23,29 @@ static errno_t SetFPUControlDefault(void)
 #else
     return _controlfp_s(0, _CW_DEFAULT, _MCW_EM | _MCW_DN | _MCW_PC | _MCW_RC | _MCW_IC);
 #endif
+#else // !defined(_WIN32)
+    return 0;
+#endif
 }
 
 static errno_t GetFPUControl(unsigned int *pctrl)
 {
     Assert(pctrl != nullptr);
+#if defined(_WIN32)
 #if _M_IX86
     *pctrl = _control87(0, 0);
     return 0;
 #else
     return _controlfp_s(pctrl, 0, 0);
 #endif
+#else // !defined(_WIN32)
+    return 0;
+#endif
 }
 
 static errno_t SetFPUControl(unsigned int fpctrl)
 {
+#if defined(_WIN32)
 #if _M_AMD64 || _M_ARM
     return _controlfp_s(0, fpctrl, _MCW_EM | _MCW_DN | _MCW_RC);
 #elif _M_IX86
@@ -45,14 +54,20 @@ static errno_t SetFPUControl(unsigned int fpctrl)
 #else
     return _controlfp_s(0, fpctrl, (unsigned int)(-1));
 #endif
+#else // !defined(_WIN32)
+    return 0;
+#endif
 }
 
 static void ClearFPUStatus(void)
 {
+#if defined(_WIN32)
     // WinSE 187789
     // _clearfp gives up the thread's time slice, so clear only if flags are set
     if (_statusfp())
         _clearfp();
+#else // !_defined(_WIN32)
+#endif
 }
 
 template <bool enabled>

@@ -83,5 +83,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
   )
 endif(CMAKE_SYSTEM_NAME STREQUAL Linux)
 
+if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+  target_link_libraries(coreclrpal
+    pthread
+  )
+endif(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+
 # Install the static PAL library for VS
 install (TARGETS coreclrpal DESTINATION lib)

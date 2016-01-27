@@ -3,30 +3,35 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 #include "CommonCommonPch.h"
+#if defined(_WIN32)
 #include <process.h>
+#endif
 
 
-#include "core\EtwTraceCore.h"
+#include "core/EtwTraceCore.h"
 
-#include "Exceptions\ExceptionBase.h"
-#include "Exceptions\OperationAbortedException.h"
-#include "Exceptions\OutOfMemoryException.h"
-#include "Exceptions\StackOverflowException.h"
+#include "Exceptions/ExceptionBase.h"
+#include "Exceptions/OperationAbortedException.h"
+#include "Exceptions/OutOfMemoryException.h"
+#include "Exceptions/StackOverflowException.h"
 
 #include "TemplateParameter.h"
-#include "DataStructures\DoublyLinkedListElement.h"
-#include "DataStructures\DoublyLinkedList.h"
-#include "DataStructures\DoublyLinkedListElement.inl"
-#include "DataStructures\DoublyLinkedList.inl"
+#include "DataStructures/DoublyLinkedListElement.h"
+#include "DataStructures/DoublyLinkedList.h"
+#include "DataStructures/DoublyLinkedListElement.inl"
+#include "DataStructures/DoublyLinkedList.inl"
 
-#include "Common\Event.h"
-#include "Common\ThreadService.h"
-#include "Common\Jobs.h"
-#include "Common\Jobs.inl"
+#include "Common/Tick.h"
+#include "Common/Event.h"
+#include "Common/ThreadService.h"
+#include "Common/Jobs.h"
+#include "Common/Jobs.inl"
 
 namespace Js
 {
-    class JavascriptExceptionObject;
+    class JavascriptExceptionObject
+    {
+    };
 };
 
 namespace JsUtil
@@ -1009,7 +1014,7 @@ namespace JsUtil
     {
         JS_ETW(EventWriteJSCRIPT_NATIVECODEGEN_START(this, 0));
 
-        ArenaAllocator threadArena(L"ThreadArena", threadData->GetPageAllocator(), Js::Throw::OutOfMemory);
+        ArenaAllocator threadArena(W("ThreadArena"), threadData->GetPageAllocator(), Js::Throw::OutOfMemory);
         threadData->threadArena = &threadArena;
 
         {
@@ -1029,7 +1034,7 @@ namespace JsUtil
             } autoDecommit(this, threadData);
 
             criticalSection.Enter();
-            while (!IsClosed() || jobs.Head() && jobs.Head()->IsCritical())
+            while (!IsClosed() || (jobs.Head() && jobs.Head()->IsCritical()))
             {
                 Job *job = jobs.UnlinkFromBeginning();
 
@@ -1213,7 +1218,8 @@ namespace JsUtil
     unsigned int WINAPI BackgroundJobProcessor::StaticThreadProc(void *lpParam)
     {
         Assert(lpParam);
-#if !defined(_UCRT)
+
+#if defined(_WIN32) && !defined(_UCRT)
         HMODULE dllHandle = NULL;
         if (!GetModuleHandleEx(0, AutoSystemInfo::GetJscriptDllFileName(), &dllHandle))
         {
@@ -1230,20 +1236,17 @@ namespace JsUtil
 #if DBG
         threadData->backgroundPageAllocator.SetConcurrentThreadId(GetCurrentThreadId());
 #endif
-        __try
-        {
+
+        SEH_TRY({
             processor->Run(threadData);
-        }
-        __except(ExceptFilter(GetExceptionInformation()))
-        {
-            Assert(false);
-        }
+        })
+        SEH_EXCEPT(ExceptFilter(GetExceptionInformation()) { Assert(false); })
 
         // Indicate to Close that the thread is about to exit. This has to be done before CoUninitialize because CoUninitialize
         // may require the loader lock and if Close was called while holding the loader lock during DLL_THREAD_DETACH, it could
         // end up waiting forever, causing a deadlock.
         threadData->threadStartedOrClosing.Set();
-#if !defined(_UCRT)
+#if defined(_WIN32) && !defined(_UCRT)
         if (dllHandle)
         {
             FreeLibraryAndExitThread(dllHandle, 0);

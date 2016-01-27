@@ -1600,5 +1600,29 @@ namespace CorUnix
     ITECS_exit:
         return fRet;
     }
+
+    PALIMPORT
+    uintptr_t PALAPI _beginthreadex(
+        void *security, unsigned stack_size,
+        PAL_start_address start_address, void *arglist,
+        unsigned initflag, unsigned *thrdaddr)
+    {
+        Assert(security == nullptr);
+
+        pthread_t *thread = null;
+        pthread_attr_t threadAttributes;
+
+        if (stack_size >= PTHREAD_STACK_MIN)
+        {
+            pthread_attr_setstacksize(&threadAttributes, stack_size);
+        }
+
+        if (pthread_create(thread, &threadAttributes, &_pthread_start, arglist) == 0)
+        {
+            return (uintptr_t)thread;
+        }
+
+        return nullptr;
+    }
 #endif // MUTEX_BASED_CSS || _DEBUG
 }

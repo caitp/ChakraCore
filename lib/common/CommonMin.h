@@ -46,7 +46,9 @@ static inline char (&Chakra_ArraySizeHelper(T (&array)[N]))[N];
 #include "core/Output.h"
 
 // === Basic Memory Header Files ===
-namespace Memory {}
+namespace Memory {
+	class ArenaAllocator;
+}
 using namespace Memory;
 #include "Memory/Allocator.h"
 #include "Memory/HeapAllocator.h"

@@ -27,16 +27,24 @@ Math::NextPowerOf2(uint32 n)
 UINT_PTR
 Math::Rand()
 {
+#if defined(_WIN32)
     unsigned int rand;
     rand_s(&rand);
     UINT_PTR newRand = static_cast<UINT_PTR>(rand);
 
 #if TARGET_64
-    rand_s(&rand);
     newRand |= static_cast<UINT_PTR>(rand) << 32;
 #endif
 
     return newRand;
+#elif defined(__FreeBSD__) || defined(__NetBSD__) ||  defined(__OpenBSD__) || \
+      defined(__bsdi__) || defined(__DragonFly__) || (__APPLE__ && __MACH__)
+    UINT_PTR newRand;
+    ::arc4random_buf(&newRand, sizeof(newRand));
+    return newRand;
+#else
+#error "Missing Math::Rand() implementation"
+#endif
 }
 
 __declspec(noreturn) void Math::DefaultOverflowPolicy()

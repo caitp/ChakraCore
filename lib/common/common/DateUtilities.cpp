@@ -3,13 +3,23 @@
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
 #include "CommonCommonPch.h"
+
+#if defined(_WIN32)
 #define ENABLE_INTSAFE_SIGNED_FUNCTIONS 1
 #include <intsafe.h>
+#endif
 
-#include "Common\DaylightTimeHelper.h"
-#include "Common\DateUtilities.h"
+#include "Common/DaylightTimeHelper.h"
+#include "Common/DateUtilities.h"
 
+#if defined(_WIN32)
 #include <Windows.Foundation.h>
+#endif
+
+#if !defined(_WIN32)
+#include <limits.h>
+static const INT64 MAXINT64 = LLONG_MAX;
+#endif
 
 namespace Js
 {

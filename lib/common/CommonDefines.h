@@ -540,9 +540,21 @@
 #endif
 
 #if __cplusplus_cli == 200406L
-#  define CLI_ABSTRACT(ClassProlog) ClassProlog abstract
-#  define CLI_SEALED(ClassProlog) ClassProlog sealed
+#define CLI_ABSTRACT(ClassProlog) ClassProlog abstract
+#define CLI_SEALED(ClassProlog) ClassProlog sealed
 #else
-#  define CLI_ABSTRACT(ClassProlog) ClassProlog
-#  define CLI_SEALED(ClassProlog) ClassProlog final
+#define CLI_ABSTRACT(ClassProlog) ClassProlog
+#define CLI_SEALED(ClassProlog) ClassProlog final
+#endif
+
+#if !defined(SEH_SUPPORT) && defined(_MSC_VER)
+#define SEH_SUPPORT 1
+#endif
+
+#if defined(SEH_SUPPORT)
+#define SEH_TRY(block) __try block
+#define SEH_EXCEPT(block) __except block
+#else
+#define SEH_TRY(block) block
+#define SEH_EXCEPT(block)
 #endif
