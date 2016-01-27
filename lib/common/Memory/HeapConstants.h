@@ -27,6 +27,9 @@ public:
 #endif
 };
 
+static_assert(HeapConstants::ObjectAllocationShift == Js::HeapConstantsObjectAllocationShift);
+static_assert(HeapConstants::ObjectGranularity == Js::HeapConstantsObjectGranularity);
+
 ///
 /// BlockAttributes are used to determine the allocation characteristics of a heap block
 /// These include the number of pages to allocate, the object capacity of the block

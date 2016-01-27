@@ -45,6 +45,7 @@ Abstract:
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <wchar.h>
 #endif
 
 #ifdef  __cplusplus
@@ -3526,6 +3527,26 @@ PALIMPORT BOOL PALAPI TryEnterCriticalSection(IN OUT LPCRITICAL_SECTION lpCritic
 
 #define SEM_FAILCRITICALERRORS          0x0001
 #define SEM_NOOPENFILEERRORBOX          0x8000
+
+#if !defined(_WIN32)
+
+typedef struct _SLIST_ENTRY {
+  struct _SLIST_ENTRY * Next;
+} SLIST_ENTRY, *PSLIST_ENTRY;
+
+typedef union DECLSPEC_ALIGN(16) _SLIST_HEADER {
+    ULONGLONG Alignment;
+    struct {
+        SLIST_ENTRY Next;
+        ULONGLONG Depth : 16;
+        ULONGLONG Sequence : 16;
+    };
+} SLIST_HEADER, *PSLIST_HEADER;
+
+PALIMPORT VOID PALAPI InitializeSListHead(IN OUT PSLIST_HEADER ListHead);
+
+
+#endif
 
 PALIMPORT
 UINT

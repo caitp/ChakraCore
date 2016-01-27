@@ -538,3 +538,11 @@
 #ifndef PROFILE_DICTIONARY
 #define PROFILE_DICTIONARY 0
 #endif
+
+#if __cplusplus_cli == 200406L
+#  define CLI_ABSTRACT(ClassProlog) ClassProlog abstract
+#  define CLI_SEALED(ClassProlog) ClassProlog sealed
+#else
+#  define CLI_ABSTRACT(ClassProlog) ClassProlog
+#  define CLI_SEALED(ClassProlog) ClassProlog final
+#endif

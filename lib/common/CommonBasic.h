@@ -52,6 +52,8 @@ typedef char16_t wchar16;
 
 #endif
 
+#include "core/globals.h"
+
 // === core Header Files ===
 #include "core/api.h"
 #include "core/CommonTypedefs.h"

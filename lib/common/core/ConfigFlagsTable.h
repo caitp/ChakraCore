@@ -52,7 +52,7 @@ namespace Js
     ///----------------------------------------------------------------------------
 
 
-    enum Flag
+    enum Flag: int
     {
 #define FLAG(type, name, ...) name##Flag,
 #include "ConfigFlagsList.h"
@@ -75,7 +75,7 @@ namespace Js
     ///----------------------------------------------------------------------------
 
 
-    enum Phase
+    enum Phase: int
     {
 #define PHASE(name) name##Phase,
 #include "ConfigFlagsList.h"

@@ -51,21 +51,10 @@ using namespace Memory;
 #include "Memory/Allocator.h"
 #include "Memory/HeapAllocator.h"
 
-// xplat-todo: Re-enable this
-// BitVector needs to be fixed up here
-
-#include "DataStructures/BitVector.h"
-
-// === Page/Arena Memory Header Files ===
-#include "Memory/VirtualAllocWrapper.h"
-#include "Memory/MemoryTracking.h"
-#include "Memory/AllocationPolicyManager.h"
-#include "Memory/PageAllocator.h"
-#include "Memory/ArenaAllocator.h"
-
 // === Data structures Header Files ===
 #include "DataStructures/comparer.h"
 #include "DataStructures/SizePolicy.h"
+#include "DataStructures/BitVector.h"
 #include "DataStructures/SList.h"
 #include "DataStructures/DList.h"
 #include "DataStructures/KeyValuePair.h"
@@ -74,3 +63,10 @@ using namespace Memory;
 
 // === Configurations Header ===
 #include "core/ConfigFlagsTable.h"
+
+// === Page/Arena Memory Header Files ===
+#include "Memory/VirtualAllocWrapper.h"
+#include "Memory/MemoryTracking.h"
+#include "Memory/AllocationPolicyManager.h"
+#include "Memory/PageAllocator.h"
+#include "Memory/ArenaAllocator.h"

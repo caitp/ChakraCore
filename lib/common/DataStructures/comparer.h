@@ -51,7 +51,7 @@ struct DefaultComparer<T *>
         // Shifting helps us eliminate any sameness due to our alignment strategy.
         // TODO: This works for Arena memory only. Recycler memory is 16 byte aligned.
         // Find a good universal hash for pointers.
-        uint hash = (uint)(((size_t)i) >> ArenaAllocator::ObjectAlignmentBitShift);
+        uint hash = (uint)(((size_t)i) >> Js::ArenaAllocatorObjectAlignmentBitShift);
         return hash;
     }
 };
@@ -109,7 +109,7 @@ struct RecyclerPointerComparer
         // Shifting helps us eliminate any sameness due to our alignment strategy.
         // TODO: This works for Recycler memory only. Arena memory is 8 byte aligned.
         // Find a good universal hash for pointers.
-        uint hash = (uint)(((size_t)i) >> HeapConstants::ObjectAllocationShift);
+        uint hash = (uint)(((size_t)i) >> Js::HeapConstantsObjectAllocationShift);
         return hash;
     }
 };

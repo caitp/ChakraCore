@@ -142,13 +142,13 @@ public:
 
         bool Next()
         {
-            if (last != nullptr && last->Next() != current)
+            if (last != nullptr && last->Next() != this->current)
             {
-                current = last;
+                this->current = last;
             }
             else
             {
-                last = current;
+                last = this->current;
             }
             return Iterator::Next();
         }
@@ -161,7 +161,7 @@ public:
         template <typename TAllocator>
         void RemoveCurrent(TAllocator * allocator)
         {
-            const NodeBase *dead = current;
+            const NodeBase *dead = this->current;
             UnlinkCurrent();
 
             auto freeFunc = TypeAllocatorFunc<TAllocator, TData>::GetFreeFunc();
@@ -178,7 +178,7 @@ public:
             {
                 newNode->Next() = last->Next();
                 const_cast<NodeBase *>(last)->Next() = newNode;
-                const_cast<SListBase *>(list)->IncrementCount();
+                const_cast<SListBase *>(this->list)->IncrementCount();
                 last = newNode;
                 return &newNode->data;
             }
@@ -194,7 +194,7 @@ public:
             {
                 newNode->Next() = last->Next();
                 const_cast<NodeBase *>(last)->Next() = newNode;
-                const_cast<SListBase *>(list)->IncrementCount();
+                const_cast<SListBase *>(this->list)->IncrementCount();
                 last = newNode;
                 return &newNode->data;
             }
@@ -210,7 +210,7 @@ public:
             {
                 newNode->Next() = last->Next();
                 const_cast<NodeBase *>(last)->Next() = newNode;
-                const_cast<SListBase *>(list)->IncrementCount();
+                const_cast<SListBase *>(this->list)->IncrementCount();
                 last = newNode;
                 return true;
             }
@@ -230,15 +230,15 @@ public:
 
         NodeBase * UnlinkCurrentNode()
         {
-            NodeBase * unlinkedNode = const_cast<NodeBase *>(current);
-            Assert(current != nullptr);
-            Assert(!list->IsHead(current));
+            NodeBase * unlinkedNode = const_cast<NodeBase *>(this->current);
+            Assert(this->current != nullptr);
+            Assert(!this->list->IsHead(this->current));
             Assert(last != nullptr);
 
-            const_cast<NodeBase *>(last)->Next() = current->Next();
-            current = last;
+            const_cast<NodeBase *>(last)->Next() = this->current->Next();
+            this->current = last;
             last = nullptr;
-            const_cast<SListBase *>(list)->DecrementCount();
+            const_cast<SListBase *>(this->list)->DecrementCount();
             return unlinkedNode;
         }
     };
@@ -477,8 +477,8 @@ public:
 
     bool Equals(SListBase const& other)
     {
-        SListBase<TData>::Iterator iter(this);
-        SListBase<TData>::Iterator iter2(&other);
+        typename SListBase<TData>::Iterator iter(this);
+        typename SListBase<TData>::Iterator iter2(&other);
         while (iter.Next())
         {
             if (!iter2.Next() || iter.Data() != iter2.Data())
@@ -549,15 +549,17 @@ class SListBaseCounted : public SListBase<TData, RealCount>
 {
 };
 
+class ArenaAllocator;
 template <typename TData, typename TAllocator = ArenaAllocator, typename TCount = DefaultCount>
 class SList : public SListBase<TData, TCount>
 {
+    typedef SListBase<TData, TCount> __SListBase;
 public:
-    class EditingIterator : public SListBase::EditingIterator
+    class EditingIterator : public __SListBase::EditingIterator
     {
     public:
-        EditingIterator() : SListBase::EditingIterator() {}
-        EditingIterator(SList * list) : SListBase::EditingIterator(list) {}
+        EditingIterator() : __SListBase::EditingIterator() {}
+        EditingIterator(SList * list) : __SListBase::EditingIterator(list) {}
         void RemoveCurrent()
         {
             __super::RemoveCurrent(Allocator());
@@ -573,7 +575,7 @@ public:
     private:
         TAllocator * Allocator() const
         {
-            return ((SList const *)list)->allocator;
+            return ((SList const *)this->list)->allocator;
         }
     };
 
@@ -622,18 +624,18 @@ public:
 
     TData Pop()
     {
-        TData data = Head();
+        TData data = this->Head();
         RemoveHead();
         return data;
     }
 
     TData const& Top() const
     {
-        return Head();
+        return this->Head();
     }
     TData& Top()
     {
-        return Head();
+        return this->Head();
     }
 private:
     TAllocator * allocator;
@@ -642,8 +644,9 @@ private:
 template <typename TData, typename TAllocator = ArenaAllocator>
 class SListCounted : public SList<TData, TAllocator, RealCount>
 {
+    typedef SList<TData, TAllocator, RealCount> __SList;
     public:
-        explicit SListCounted(TAllocator * allocator) : SList(allocator) {}
+        explicit SListCounted(TAllocator * allocator) : __SList(allocator) {}
 
 };
 

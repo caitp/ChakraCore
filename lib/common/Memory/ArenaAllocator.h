@@ -130,7 +130,7 @@ protected:
 // Implements most of memory management operations over ArenaData.
 // The TFreeListPolicy handles free-listing for "small objects". There
 // is no support for free-listing for "large objects".
-#if defined(_M_X64_OR_ARM64)
+#if defined(_M_X64_OR_ARM64) || defined(BIT64)
 // Some data structures such as jmp_buf expect to be 16 byte aligned on AMD64.
 template <class TFreeListPolicy, size_t ObjectAlignmentBitShiftArg = 4, bool RequireObjectAlignment = false, size_t MaxObjectSize = 0>
 #else
@@ -371,6 +371,13 @@ public:
 class ArenaAllocator : public ArenaAllocatorBase<InPlaceFreeListPolicy>
 {
 public:
+    using Base = ArenaAllocatorBase<InPlaceFreeListPolicy>;
+    static const size_t ObjectAlignmentBitShift = Base::ObjectAlignmentBitShift;
+    static const size_t MaxSmallObjectSize = Base::MaxSmallObjectSize;
+    static const size_t ObjectAlignment = Base::ObjectAlignment;
+
+    CompileAssert(ObjectAlignmentBitShift == Js::ArenaAllocatorObjectAlignmentBitShift);
+
     ArenaAllocator(__in LPCWSTR name, PageAllocator * pageAllocator, void (*outOfMemoryFunc)(), void (*recoverMemoryFunc)() = JsUtil::ExternalApi::RecoverUnusedMemory) :
         ArenaAllocatorBase<InPlaceFreeListPolicy>(name, pageAllocator, outOfMemoryFunc, recoverMemoryFunc)
     {
@@ -570,7 +577,7 @@ public:
     CompileAssert(sizeof(CacheLayout) == sizeof(FreeObject));
     CompileAssert(offsetof(CacheLayout, strongRef) == offsetof(FreeObject, next));
 
-#if defined(_M_X64_OR_ARM64)
+#if defined(_M_X64_OR_ARM64) || defined(BIT64)
     CompileAssert(sizeof(CacheLayout) == 32);
     static const size_t ObjectAlignmentBitShift = 5;
 #else
@@ -743,7 +750,7 @@ public:
         char bytes[4 * sizeof(intptr)];
     };
 
-#if _M_X64 || _M_ARM64
+#if defined(_M_X64_OR_ARM64) || defined(BIT64)
     CompileAssert(sizeof(CacheLayout) == 32);
     static const size_t ObjectAlignmentBitShift = 5;
 #else
@@ -804,7 +811,7 @@ public:
 
 class RefCounted
 {
-    volatile long refCount;
+    volatile LONG refCount;
 
 protected:
     virtual ~RefCounted()
@@ -845,34 +852,11 @@ class WeakArenaReference
     T* p;
 
 public:
-    WeakArenaReference(ReferencedArenaAdapter* _adapter,T* _p)
-        : adapter(_adapter),
-          p(_p)
-    {
-        adapter->AddRef();
-    }
+    WeakArenaReference(ReferencedArenaAdapter* _adapter, T* _p);
+    ~WeakArenaReference();
 
-    ~WeakArenaReference()
-    {
-        adapter->Release();
-        adapter = NULL;
-    }
-
-    T* GetStrongReference()
-    {
-        if(adapter->AddStrongReference())
-        {
-            return p;
-        }
-        else
-        {
-            return NULL;
-        }
-    }
-    void ReleaseStrongReference()
-    {
-        adapter->ReleaseStrongReference();
-    }
+    T* GetStrongReference();
+    void ReleaseStrongReference();
 };
 
 // This class enables WeakArenaReferences to track whether
@@ -970,6 +954,41 @@ public:
         return NULL;
     }
 };
+
+template <class T>
+WeakArenaReference<T>::WeakArenaReference(ReferencedArenaAdapter* _adapter,T* _p)
+        : adapter(_adapter),
+          p(_p)
+{
+    adapter->AddRef();
+}
+
+template <class T>
+WeakArenaReference<T>::~WeakArenaReference()
+{
+    adapter->Release();
+    adapter = NULL;
+}
+
+template <class T>
+T* WeakArenaReference<T>::GetStrongReference()
+{
+    if(adapter->AddStrongReference())
+    {
+        return p;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+template <class T>
+void WeakArenaReference<T>::ReleaseStrongReference()
+{
+    adapter->ReleaseStrongReference();
+}
+
 }
 
 //we don't need these for the ArenaAllocator
