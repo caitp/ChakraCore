@@ -155,20 +155,10 @@ protected:
 };
 #endif
 
-#if 0 && defined(_MSC_VER) || !defined(SMALL_FINALIZABLE_HEAP_BLOCK_CPP)
-extern template class SmallFinalizableHeapBlockT<SmallAllocationBlockAttributes>;
-extern template class SmallFinalizableHeapBlockT<MediumAllocationBlockAttributes>;
-#endif
-
 typedef SmallFinalizableHeapBlockT<SmallAllocationBlockAttributes>  SmallFinalizableHeapBlock;
 typedef SmallFinalizableHeapBlockT<MediumAllocationBlockAttributes>    MediumFinalizableHeapBlock;
 
 #ifdef RECYCLER_WRITE_BARRIER
-#if 0 && defined(_MSC_VER) ||  !defined(SMALL_FINALIZABLE_HEAP_BLOCK_CPP)
-extern template class SmallFinalizableWithBarrierHeapBlockT<SmallAllocationBlockAttributes>;
-extern template class SmallFinalizableWithBarrierHeapBlockT<MediumAllocationBlockAttributes>;
-#endif
-
 typedef SmallFinalizableWithBarrierHeapBlockT<SmallAllocationBlockAttributes>   SmallFinalizableWithBarrierHeapBlock;
 typedef SmallFinalizableWithBarrierHeapBlockT<MediumAllocationBlockAttributes>     MediumFinalizableWithBarrierHeapBlock;
 #endif

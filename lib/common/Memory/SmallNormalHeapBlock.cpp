@@ -2,7 +2,6 @@
 // Copyright (C) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 //-------------------------------------------------------------------------------------------------------
-#define SMALL_NORMAL_HEAP_BLOCK_CPP
 #include "CommonMemoryPch.h"
 
 template <class TBlockAttributes>

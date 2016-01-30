@@ -82,20 +82,10 @@ protected:
 };
 #endif
 
-#if 0 && defined(_MSC_VER) || !defined(SMALL_NORMAL_HEAP_BLOCK_CPP)
-extern template class SmallNormalHeapBlockT<SmallAllocationBlockAttributes>;
-extern template class SmallNormalHeapBlockT<MediumAllocationBlockAttributes>;
-#endif
-
 typedef SmallNormalHeapBlockT<SmallAllocationBlockAttributes> SmallNormalHeapBlock;
 typedef SmallNormalHeapBlockT<MediumAllocationBlockAttributes> MediumNormalHeapBlock;
 
 #ifdef RECYCLER_WRITE_BARRIER
-#if 0 && defined(_MSC_VER) || !defined(SMALL_NORMAL_HEAP_BLOCK_CPP)
-extern template class SmallNormalWithBarrierHeapBlockT<SmallAllocationBlockAttributes>;
-extern template class SmallNormalWithBarrierHeapBlockT<MediumAllocationBlockAttributes>;
-#endif
-
 typedef SmallNormalWithBarrierHeapBlockT<SmallAllocationBlockAttributes> SmallNormalWithBarrierHeapBlock;
 typedef SmallNormalWithBarrierHeapBlockT<MediumAllocationBlockAttributes> MediumNormalWithBarrierHeapBlock;
 #endif

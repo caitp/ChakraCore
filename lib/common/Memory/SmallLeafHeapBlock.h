@@ -34,12 +34,6 @@ private:
     SmallLeafHeapBlockT(HeapBucketT<SmallLeafHeapBlockT> * bucket, ushort objectSize, ushort objectCount);
 };
 
-#if 0 && defined(_MSC_VER) || !defined(SMALL_LEAF_HEAP_BLOCK_CPP)
-// Declare the class templates
-extern template class SmallLeafHeapBlockT<SmallAllocationBlockAttributes>;
-extern template class SmallLeafHeapBlockT<MediumAllocationBlockAttributes>;
-#endif
-
 typedef SmallLeafHeapBlockT<SmallAllocationBlockAttributes> SmallLeafHeapBlock;
 typedef SmallLeafHeapBlockT<MediumAllocationBlockAttributes>   MediumLeafHeapBlock;
 }
